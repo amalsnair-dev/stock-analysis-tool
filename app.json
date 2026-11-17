@@ -1,0 +1,57 @@
+{
+  "expo": {
+    "name": "AURIX",
+    "slug": "aurix-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "platforms": ["android", "web"],
+    "scheme": "aurix",
+    "userInterfaceStyle": "automatic",
+    "android": {
+      "package": "com.aurix.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#364550",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#364550",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 260
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Item Details to access your camera to scan barcodes.",
+          "recordAudioAndroid": false
+        }
+      ],
+      "expo-secure-store",
+      "expo-audio",
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

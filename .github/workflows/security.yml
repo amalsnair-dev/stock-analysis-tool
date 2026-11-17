@@ -1,0 +1,42 @@
+name: "Security & Quality (100% Free)"
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  security-scan:
+    name: Free Security & Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🛡️ Audit NPM Dependencies for Vulnerabilities
+        run: |
+          npm audit --audit-level=high || true
+
+      - name: 🔍 Semgrep Open Source Security Scan (Free)
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/secrets
+            p/owasp-top-ten
+            p/javascript
+            p/typescript
+        env:
+          SEMGREP_RULES: p/default

@@ -1,0 +1,85 @@
+name: CD Build Production APK & AAB
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  build-android:
+    name: Build Android Release (APK & AAB)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: ☕ Setup Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 🐘 Setup Gradle with Cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: 📦 Install Dependencies
+        run: npm ci --prefer-offline
+
+      - name: 📝 Configure Environment Variables for Release
+        run: |
+          cat << 'EOF' > .env
+          EXPO_PUBLIC_SOFTHUB_API_PROTOCOL=${{ secrets.EXPO_PUBLIC_SOFTHUB_API_PROTOCOL || 'http' }}
+          EXPO_PUBLIC_SOFTHUB_API_HOST=${{ secrets.EXPO_PUBLIC_SOFTHUB_API_HOST || '192.168.1.7' }}
+          EXPO_PUBLIC_SOFTHUB_API_PORT=${{ secrets.EXPO_PUBLIC_SOFTHUB_API_PORT || '8081' }}
+          EXPO_PUBLIC_SOFTHUB_API_PROJECT=${{ secrets.EXPO_PUBLIC_SOFTHUB_API_PROJECT || 'btssofthubapi' }}
+
+          EXPO_PUBLIC_OWNER_API_PROTOCOL=${{ secrets.EXPO_PUBLIC_OWNER_API_PROTOCOL || 'http' }}
+          EXPO_PUBLIC_OWNER_API_HOST=${{ secrets.EXPO_PUBLIC_OWNER_API_HOST || '192.168.1.7' }}
+          EXPO_PUBLIC_OWNER_API_PORT=${{ secrets.EXPO_PUBLIC_OWNER_API_PORT || '8082' }}
+          EXPO_PUBLIC_OWNER_API_PROJECT=${{ secrets.EXPO_PUBLIC_OWNER_API_PROJECT || 'aurixownersapi' }}
+          EOF
+
+      - name: 📜 Accept Android SDK Licenses
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses 2>/dev/null || yes | sdkmanager --licenses 2>/dev/null || true
+
+      - name: ⚙️ Prepare Android Native Directory
+        run: |
+          chmod +x android/gradlew
+
+      - name: ⚡ Build Release APK & AAB Bundle (Fast & Parallel)
+        run: |
+          cd android
+          ./gradlew assembleRelease bundleRelease \
+            --no-daemon \
+            --parallel \
+            --build-cache \
+            -Dorg.gradle.jvmargs="-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+UseParallelGC" \
+            -Dorg.gradle.parallel=true \
+            -Dorg.gradle.caching=true
+
+      - name: 📱 Upload Release APK (Direct Device Installation)
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurix-app-release-apk
+          path: android/app/build/outputs/apk/release/*.apk
+          retention-days: 30
+
+      - name: 📦 Upload Google Play Store Bundle (AAB)
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurix-app-production-aab
+          path: android/app/build/outputs/bundle/release/*.aab
+          retention-days: 30
+
