@@ -1,4 +1,4 @@
-# AURIX Mobile App 📱✨
+# STA Mobile App 📱✨
 > **An Allure Jewelry ERP Software** — Cross-platform mobile inventory management, stock taking, and barcode scanning solution built with React Native and Expo.
 
 ---
@@ -18,7 +18,7 @@
 ---
 
 ## 🌟 Overview
-**AURIX** is a specialized mobile client tailored for jewelry retail and manufacturing enterprises running the Allure ERP ecosystem. It empowers floor staff, auditors, and shop managers to perform lightning-fast inventory audits, scan jewelry tags via high-performance device camera, verify live item weights, calculate estimates, and reconcile stock transactions seamlessly across branches.
+**STA** is a specialized mobile client tailored for jewelry retail and manufacturing enterprises running the Allure ERP ecosystem. It empowers floor staff, auditors, and shop managers to perform lightning-fast inventory audits, scan jewelry tags via high-performance device camera, verify live item weights, calculate estimates, and reconcile stock transactions seamlessly across branches.
 
 ---
 
